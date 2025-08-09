@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>LaTeX sang Word Equation</title>
-<!-- Tải thư viện LaTeX -> MathML -->
-<script src="https://cdn.jsdelivr.net/npm/latex2mathml@2.4.1/latex2mathml.min.js"></script>
+<!-- Thư viện LaTeX -> MathML -->
+<script src="https://unpkg.com/latex2mathml@2.4.1/dist/latex2mathml.min.js"></script>
 <style>
 body { font-family: Arial, sans-serif; max-width: 800px; margin: auto; padding: 20px; }
 textarea { width: 100%; height: 200px; margin-bottom: 10px; }
@@ -35,7 +35,7 @@ document.getElementById('btn-export').addEventListener('click', function(){
         let latex = document.getElementById('math-input').value.trim();
         if (!latex) { alert("Vui lòng nhập LaTeX"); return; }
 
-        let mathml = latex2mathml(latex); // cần thư viện này
+        let mathml = latex2mathml(latex); // Thư viện đã load từ CDN
         mathml = escapeXml(mathml);
 
         let wordXml =
