@@ -1,0 +1,54 @@
+﻿math2word.html<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>LaTeX sang Word Equation</title>
+<script src="https://cdn.jsdelivr.net/npm/latex2mathml@2.4.1/latex2mathml.min.js"></script>
+<style>
+body { font-family: Arial; max-width: 800px; margin: auto; }
+textarea { width: 100%; height: 200px; }
+button { margin-top: 10px; padding: 8px 14px; }
+</style>
+</head>
+<body>
+<h2>Xuất Word Equation từ LaTeX</h2>
+<textarea id="math-input">$2^{x+1} = 8^{x-2}$</textarea><br>
+<button id="btn-export">Tải file Word Equation</button>
+
+<script>
+document.getElementById('btn-export').addEventListener('click', function(){
+    let latex = document.getElementById('math-input').value.trim();
+    if (!latex) { alert("Vui lòng nhập LaTeX"); return; }
+
+    // Chuyển LaTeX → MathML
+    let mathml = latex2mathml(latex);
+
+    // Word 2003 XML bọc MathML
+    let wordXml =
+`<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Word.Document"?>
+<w:wordDocument xmlns:w="http://schemas.microsoft.com/office/word/2003/wordml"
+                xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"
+                xmlns:aml="http://schemas.microsoft.com/aml/2001/core"
+                xmlns:wx="http://schemas.microsoft.com/office/word/2003/auxHint"
+                xmlns:o="urn:schemas-microsoft-com:office:office"
+                xmlns:v="urn:schemas-microsoft-com:vml">
+<w:body>
+<w:p>
+${mathml}
+</w:p>
+</w:body>
+</w:wordDocument>`;
+
+    // Chuyển sang Base64 để tải
+    let base64Data = btoa(unescape(encodeURIComponent(wordXml)));
+    let link = document.createElement('a');
+    link.href = 'data:application/msword;base64,' + base64Data;
+    link.download = 'BaiToan.doc';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+});
+</script>
+</body>
+</html>
