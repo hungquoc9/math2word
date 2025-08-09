@@ -20,73 +20,15 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            padding: 20px;
-            background-color: #f4f4f9;
-            margin: 0;
-        }
-        .container {
-            width: 100%;
-            max-width: 600px;
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        h2 {
-            text-align: center;
-            color: #333;
-            margin-top: 0;
-            margin-bottom: 20px;
-        }
-        textarea {
-            width: 100%;
-            height: 200px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 16px;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-        }
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 16px;
-            margin-bottom: 20px;
-            box-sizing: border-box;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-        #render-hidden {
-            position: absolute;
-            visibility: hidden;
-            height: 0;
-            width: 0;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 20px; background-color: #f4f4f9; margin: 0; }
+        .container { width: 100%; max-width: 600px; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; margin-top: 0; margin-bottom: 20px; }
+        textarea { width: 100%; height: 200px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; margin-bottom: 15px; box-sizing: border-box; }
+        input[type="text"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; margin-bottom: 20px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; font-size: 18px; cursor: pointer; transition: background-color 0.3s; }
+        button:hover { background-color: #45a049; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        #render-hidden { position: absolute; visibility: hidden; height: 0; width: 0; }
     </style>
 </head>
 <body>
@@ -108,8 +50,23 @@
         const fileNameInput = document.getElementById('fileName');
         const renderDiv = document.getElementById('render-hidden');
 
-        function utf8_to_b64( str ) {
-            return window.btoa(unescape(encodeURIComponent( str )));
+        /**
+         * Hàm chuyển đổi SVG sang Base64 một cách hiện đại và an toàn
+         * @param {string} svgString - Chuỗi SVG cần chuyển đổi.
+         * @returns {Promise<string>} - Promise trả về chuỗi Base64.
+         */
+        function svgStringToBase64(svgString) {
+            return new Promise(resolve => {
+                const blob = new Blob([svgString], { type: 'image/svg+xml' });
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    // reader.result là một Data URL đầy đủ, ví dụ: "data:image/svg+xml;base64,PHN2ZyB4b..."
+                    // Chúng ta chỉ cần phần dữ liệu base64 phía sau dấu phẩy.
+                    const base64data = reader.result.split(',')[1];
+                    resolve(base64data);
+                };
+                reader.readAsDataURL(blob);
+            });
         }
 
         downloadBtn.addEventListener('click', async () => {
@@ -125,7 +82,7 @@
             try {
                 const regex = /(\$\$?[\s\S]*?\$\$?)/g;
                 const parts = fullText.split(regex).filter(part => part);
-                const runs = [];
+                const paragraphs = [];
 
                 for (const part of parts) {
                     if (part.match(regex)) {
@@ -137,40 +94,36 @@
                         if (svgElement) {
                             const serializer = new XMLSerializer();
                             const svgString = serializer.serializeToString(svgElement);
-                            const base64Image = utf8_to_b64(svgString);
+                            
+                            // Sử dụng hàm mới, hiện đại và an toàn
+                            const base64Image = await svgStringToBase64(svgString);
 
                             const width = parseFloat(svgElement.getAttribute('width').replace('ex', '')) * 9;
                             const height = parseFloat(svgElement.getAttribute('height').replace('ex', '')) * 9;
 
-                            runs.push(
-                                new ImageRun({
-                                    data: base64Image,
-                                    transformation: {
-                                        width: width,
-                                        height: height,
-                                    },
-                                })
-                            );
+                            paragraphs.push(new Paragraph({
+                                children: [
+                                    new ImageRun({
+                                        data: base64Image,
+                                        transformation: { width, height },
+                                    })
+                                ],
+                            }));
                         }
                     } else {
-                        // Xử lý văn bản thường, bao gồm cả ký tự xuống dòng
-                        const textParts = part.split('\n');
-                        for (let i = 0; i < textParts.length; i++) {
-                            runs.push(new TextRun(textParts[i]));
-                            if (i < textParts.length - 1) {
-                                runs.push(new TextRun({ text: "", break: 1 }));
-                            }
+                        // Xử lý văn bản thường
+                        const textLines = part.split('\n');
+                        for (const line of textLines) {
+                            paragraphs.push(new Paragraph({
+                                children: [new TextRun(line)],
+                            }));
                         }
                     }
                 }
-                
+
                 const doc = new Document({
                     sections: [{
-                        children: [
-                            new Paragraph({
-                                children: runs,
-                            }),
-                        ],
+                        children: paragraphs,
                     }],
                 });
 
@@ -178,8 +131,8 @@
                 saveAs(blob, fileNameInput.value || 'document.docx');
 
             } catch (error) {
-                console.error("Lỗi khi tạo file docx:", error);
-                alert("Đã xảy ra lỗi nghiêm trọng. Vui lòng chụp lại màn hình console (nhấn F12) và gửi lại nếu có thể.");
+                console.error("Lỗi nghiêm trọng khi tạo file:", error);
+                alert("Đã xảy ra lỗi. Vui lòng thử lại. Nếu vẫn không được, có thể công thức quá phức tạp.");
             } finally {
                 downloadBtn.disabled = false;
                 downloadBtn.textContent = 'Tải file .docx';
