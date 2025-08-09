@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Công cụ Toán sang Word</title>
+    <title>Chuyển Toán học sang DOCX (Bản thử nghiệm)</title>
 
+    <script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script>
     MathJax = {
         loader: {load: ['input/tex', 'output/svg']},
@@ -14,52 +16,93 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 20px; background-color: #f4f4f9; margin: 0; }
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 20px; background-color: #f4f4f9; margin: 0; }
         .container { width: 100%; max-width: 600px; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         h2 { text-align: center; color: #333; margin-top: 0; margin-bottom: 20px; }
-        textarea { width: 100%; height: 250px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; margin-bottom: 20px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; font-size: 18px; cursor: pointer; transition: background-color 0.3s; }
-        button:hover { background-color: #0056b3; }
+        textarea { width: 100%; height: 200px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; margin-bottom: 15px; box-sizing: border-box; }
+        input[type="text"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; margin-bottom: 20px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background-color: #e74c3c; color: white; border: none; border-radius: 4px; font-size: 18px; cursor: pointer; }
+        button:disabled { background-color: #ccc; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Công cụ Tạo Đề Toán</h2>
-        <textarea id="mathInput" placeholder="Nhập đề bài vào đây, dùng $...$ hoặc $$...$$ cho công thức toán."></textarea>
-        <button id="previewBtn">✅ Tạo đề để Copy sang Word</button>
+        <h2>Công cụ Download DOCX (Bản thử nghiệm)</h2>
+        <textarea id="mathInput" placeholder="Nhập đề bài... Dùng $...$ hoặc $$...$$ cho công thức."></textarea>
+        <input type="text" id="fileName" value="baitap.docx" placeholder="Tên file...">
+        <button id="downloadBtn">📥 Download file .docx</button>
     </div>
 
+    <div id="render-hidden" style="position: absolute; visibility: hidden;"></div>
+
     <script>
-        const previewBtn = document.getElementById('previewBtn');
+        const { Document, Packer, Paragraph, TextRun, ImageRun } = docx;
+
+        const downloadBtn = document.getElementById('downloadBtn');
         const mathInput = document.getElementById('mathInput');
+        const fileNameInput = document.getElementById('fileName');
+        const renderDiv = document.getElementById('render-hidden');
 
-        previewBtn.addEventListener('click', () => {
-            const content = mathInput.value.replace(/\n/g, '<br>'); // Thay thế các lần xuống dòng bằng thẻ <br>
+        function svgStringToBase64(svgString) {
+            return new Promise(resolve => {
+                const blob = new Blob([svgString], { type: 'image/svg+xml' });
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const base64data = reader.result.split(',')[1];
+                    resolve(base64data);
+                };
+                reader.readAsDataURL(blob);
+            });
+        }
 
-            // Mở một cửa sổ mới
-            const previewWindow = window.open('', '_blank');
-            
-            // Ghi nội dung HTML hoàn chỉnh vào cửa sổ đó
-            previewWindow.document.write(`
-                <!DOCTYPE html>
-                <html lang="vi">
-                <head>
-                    <title>Bản xem trước - Sẵn sàng để sao chép</title>
-                    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"><\/script>
-                    <style>
-                        body { font-family: 'Times New Roman', Times, serif; font-size: 16pt; margin: 40px; }
-                    </style>
-                </head>
-                <body>
-                    ${content}
-                </body>
-                </html>
-            `);
+        downloadBtn.addEventListener('click', async () => {
+            const fullText = mathInput.value;
+            if (!fullText.trim()) return;
 
-            previewWindow.document.close();
+            downloadBtn.disabled = true;
+            downloadBtn.textContent = 'Đang xử lý...';
+
+            try {
+                const regex = /(\$\$?[\s\S]*?\$\$?)/g;
+                const parts = fullText.split(regex).filter(part => part);
+                const paragraphs = [];
+
+                for (const part of parts) {
+                    if (part.match(regex)) {
+                        renderDiv.innerHTML = part;
+                        await MathJax.typesetPromise([renderDiv]);
+                        const svgElement = renderDiv.querySelector('svg');
+                        if (svgElement) {
+                            const serializer = new XMLSerializer();
+                            const svgString = serializer.serializeToString(svgElement);
+                            const base64Image = await svgStringToBase64(svgString);
+                            const width = parseFloat(svgElement.getAttribute('width').replace('ex', '')) * 9;
+                            const height = parseFloat(svgElement.getAttribute('height').replace('ex', '')) * 9;
+                            paragraphs.push(new Paragraph({
+                                children: [new ImageRun({ data: base64Image, transformation: { width, height } })],
+                            }));
+                        }
+                    } else {
+                        const textLines = part.split('\n');
+                        for (const line of textLines) {
+                            paragraphs.push(new Paragraph({ children: [new TextRun(line)] }));
+                        }
+                    }
+                }
+
+                const doc = new Document({ sections: [{ children: paragraphs }] });
+                const blob = await Packer.toBlob(doc);
+                saveAs(blob, fileNameInput.value || 'document.docx');
+
+            } catch (error) {
+                console.error("Lỗi khi tạo file:", error);
+                alert("Đã xảy ra lỗi khi tạo file. Chức năng này không ổn định.");
+            } finally {
+                downloadBtn.disabled = false;
+                downloadBtn.textContent = '📥 Download file .docx';
+            }
         });
     </script>
-
 </body>
 </html>
