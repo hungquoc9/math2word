@@ -1,139 +1,182 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chuyển Toán học sang DOCX (Bản độc lập)</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chuyển Toán học sang DOCX (Bản cuối)</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 20px; background-color: #f4f4f9; margin: 0; }
+    .container { width: 100%; max-width: 800px; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    h2 { text-align: center; color: #333; margin-top: 0; margin-bottom: 20px; }
+    textarea { width: 100%; height: 250px; padding: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; margin-bottom: 15px; box-sizing: border-box; line-height: 1.6; }
+    input[type="text"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; margin-bottom: 20px; box-sizing: border-box; }
+    button { width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 4px; font-size: 18px; cursor: pointer; transition: background-color 0.2s; }
+    button:hover { background-color: #218838; }
+    button:disabled { background-color: #ccc; cursor: not-allowed; }
+  </style>
 
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 20px; background-color: #f4f4f9; margin: 0; }
-        .container { width: 100%; max-width: 800px; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #333; margin-top: 0; margin-bottom: 20px; }
-        textarea { width: 100%; height: 250px; padding: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; margin-bottom: 15px; box-sizing: border-box; line-height: 1.6; }
-        input[type="text"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; margin-bottom: 20px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 4px; font-size: 18px; cursor: pointer; transition: background-color 0.2s; }
-        button:hover { background-color: #218838; }
-        button:disabled { background-color: #ccc; cursor: not-allowed; }
-    </style>
-    
-    <script>!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(exports):"function"==typeof define&&define.amd?define(["exports"],t):t((e="undefined"!=typeof globalThis?globalThis:e||self).docx={})}(this,(function(e){"use strict";var t={};Object.defineProperty(t,"__esModule",{value:!0});var i={};Object.defineProperty(i,"__esModule",{value:!0}),i.Bookmark=void 0;class s{constructor({id:e,name:t}){this.id=e,this.name=t}}i.Bookmark=s;var n={};Object.defineProperty(n,"__esModule",{value:!0}),n.Hyperlink=void 0;class a{constructor({link:e,text:t,type:i,anchor:s,children:n=[]}){if(this.link=e,this.text=t,this.type=i,this.anchor=s,this.children=n,"anchor"===i&&!s)throw new Error("anchor is required when type is anchor");"external"===i&&!e&&!t&&0===n.length&&console.warn("No link, text, or children provided for hyperlink")}}n.Hyperlink=a;var r={};Object.defineProperty(r,"__esModule",{value:!0}),r.Outline=void 0;class o{constructor({level:e,text:t}){this.level=e,this.text=t}}r.Outline=o;var h={};Object.defineProperty(h,"__esModule",{value:!0}),h.FootnoteReferenceRun=void 0;class l{constructor(e){this.options=e}}h.FootnoteReferenceRun=l;var c={};Object.defineProperty(c,"__esModule",{value:!0});var p={};Object.defineProperty(p,"__esModule",{value:!0}),p.SimpleField=void 0;class u{constructor(e){this.instruction=e}}p.SimpleField=u;var d,m={};Object.defineProperty(m,"__esModule",{value:!0}),function(e){e.PAGE="PAGE",e.NUM_PAGES="NUMPAGES",e.DATE="DATE",e.STYLEREF="STYLEREF"}(d||(d={}));var g,f={};Object.defineProperty(f,"__esModule",{value:!0}),function(e){e.MERGE_FORMAT="\\* MERGEFORMAT",e.CHAR_FORMAT="\\* CHARFORMAT"}(g||(g={}));var v={};Object.defineProperty(v,"__esModule",{value:!0}),v.PageNumber=void 0;const w=Object.freeze({pageNumber:d.PAGE,pageNumberInsection:d.PAGE,totalPages:d.NUM_PAGES,totalPagesInsection:d.NUM_PAGES});v.PageNumber=w;var b={};Object.defineProperty(b,"__esModule",{value:!0}),b.SequentialIdentifier=void 0;class y{constructor(e){this.identifier=e}}b.SequentialIdentifier=y;var T={};Object.defineProperty(T,"__esModule",{value:!0});var I={};Object.defineProperty(I,"__esModule",{value:!0}),I.Tab=void 0;class x{constructor(e={}){this.options=e}}I.Tab=x;var M,S={};Object.defineProperty(S,"__esModule",{value:!0}),function(e){e.LEFT="left",e.RIGHT="right",e.CENTER="center",e.BAR="bar",e.CLEAR="clear",e.DECIMAL="decimal",e.END="end",e.NUM="num",e.START="start"}(M||(M={}));var k,E={};Object.defineProperty(E,"__esModule",{value:!0}),function(e){e.DOT="dot",e.LEADER="leader",e.HYPHEN="hyphen",e.MIDDLE_DOT="middleDot",e.NONE="none",e.UNDERSCORE="underscore"}(k||(k={}));var P,A={};Object.defineProperty(A,"__esModule",{value:!0}),function(e){e.AUTOMATIC="automatic",e.LEFT="left",e.RIGHT="right",e.CENTER="center",e.INSIDE="inside",e.OUTSIDE="outside"}(P||(P={}));var N,R={};Object.defineProperty(R,"__esModule",{value:!0}),function(e){e.DEFAULT="default",e.NUMBER_IN_DASH="numberInDash"}(N||(N={}));var C={};Object.defineProperty(C,"__esModule",{value:!0}),C.PageBreak=void 0;class O{constructor(e={}){this.options=e}}C.PageBreak=O;var _,B={};Object.defineProperty(B,"__esModule",{value:!0}),function(e){e.COLUMN="column",e.PAGE="page",e.TEXT_WRAPPING="textWrapping"}(_||(_={}));var F={};Object.defineProperty(F,"__esModule",{value:!0}),F.SymbolRun=void 0;class D{constructor({char:e,symbolfont:t="Symbol"}){this.char=e,this.symbolfont=t}}F.SymbolRun=D;var L={};Object.defineProperty(L,"__esModule",{value:!0});var j={};Object.defineProperty(j,"__esModule",{value:!0}),j.TextRun=void 0;class U{constructor(e){if("string"==typeof e?this.options={text:e}:this.options=e,""===this.options.text&&!this.options.children){const e=new Error("`text` or `children` must be provided");try{JSON.stringify(this.options)}catch(t){throw e}throw e}}j.TextRun=U;var z={};Object.defineProperty(z,"__esModule",{value:!0}),z.ImageRun=void 0;class H{constructor(e){if(this.options=e,!(e.data||e.reference))throw new Error("data or reference must be provided")}}z.ImageRun=H;var W={};Object.defineProperty(W,"__esModule",{value:!0}),W.Run=void 0;const G=class{constructor(e){this.options=e}};W.Run=G;var q={};Object.defineProperty(q,"__esModule",{value:!0}),q.Paragraph=void 0;const V=class{constructor(e){if("string"==typeof e?this.options={text:e}:this.options=e,e.children){for(const t of e.children)if(t instanceof V){const e=new Error("Paragraph cannot contain another Paragraph. If you want to add a new line, use the `text` property of `TextRun` and include `\\n`.");try{JSON.stringify(this.options)}catch(t){throw e}throw e}}}};q.Paragraph=V;var X={};Object.defineProperty(X,"__esModule",{value:!0}),X.TableOfContents=void 0;class Y{constructor(e,t={}){this.instruction=e,this.options=t}}X.TableOfContents=Y;var Z={};Object.defineProperty(Z,"__esModule",{value:!0}),Z.ExternalHyperlink=void 0;const J=class{constructor(e){this.options=e}};Z.ExternalHyperlink=J;var K={};Object.defineProperty(K,"__esModule",{value:!0}),K.InternalHyperlink=void 0;const Q=class{constructor(e){this.options=e}};K.InternalHyperlink=Q;var ee={};Object.defineProperty(ee,"__esModule",{value:!0}),ee.Table=void 0;class te{constructor({rows:e,width:t,margins:i,layout:s,float:n,visuallyRightToLeft:a,columnWidths:r,indent:o,style:h,cantSplit:l,getBorders:c=()=>({}),getCells:p=()=>({}),getMargins:u=()=>({})}){this.rows=e,this.columnWidths=r||Array(Math.max(...e.map((e=>e.cells.length)))).fill(100),this.width=t,this.margins=i,this.layout=s,this.float=n,this.visuallyRightToLeft=a,this.indent=o,this.style=h,this.cantSplit=l,this.borders=c(void 0),this.cellBorders=p(void 0),this.cellMargins=u(void 0)}}ee.Table=te;var ie={};Object.defineProperty(ie,"__esModule",{value:!0}),ie.TableCell=void 0;class se{constructor({children:e,borders:t,margins:i,verticalAlign:s,shading:n,width:a,rowSpan:r,columnSpan:o,verticalMerge:h}){this.children=e,this.borders=t,this.margins=i,this.verticalAlign=s,this.shading=n,this.width=a,this.rowSpan=r,this.columnSpan=o,this.verticalMerge=h}}ie.TableCell=se;var ne={};Object.defineProperty(ne,"__esModule",{value:!0}),ne.TableRow=void 0;class ae{constructor({cells:e,height:t,cantSplit:i,tableHeader:s,margins:n}){this.cells=e,this.height=t,this.cantSplit=i,this.tableHeader=s,this.margins=n}}ne.TableRow=ae;var re,oe={};Object.defineProperty(oe,"__esModule",{value:!0}),function(e){e.AUTO="auto",e.DXA="dxa",e.PERCENT="pct"}(re||(re={}));var he,le={};Object.defineProperty(le,"__esModule",{value:!0}),function(e){e.TOP="top",e.CENTER="center",e.BOTTOM="bottom"}(he||(he={}));var ce,pe={};Object.defineProperty(pe,"__esModule",{value:!0}),function(e){e.RESTART="restart",e.CONTINUE="continue"}(ce||(ce={}));var ue,de={};Object.defineProperty(de,"__esModule",{value:!0}),function(e){e.FIXED="fixed",e.AUTOFIT="autofit"}(ue||(ue={}));var me,ge={};Object.defineProperty(ge,"__esModule",{value:!0}),function(e){e.TOP="top",e.BOTTOM="bottom",e.LEFT="left",e.RIGHT="right"}(me||(me={}));var fe,ve={};Object.defineProperty(ve,"__esModule",{value:!0}),function(e){e.EXACT="exact",e.ATLEAST="atLeast"}(fe||(fe={}));var we={};Object.defineProperty(we,"__esModule",{value:!0}),we.Document=void 0;const be=class{constructor({sections:e,numbering:t,footnotes:i,hyperlinks:s,background:n,creator:a="Un-named",description:r="Un-named",title:o="Un-named",subject:h="Un-named",keywords:l="Un-named",lastModifiedBy:c="Un-named",revision:p=1,externalStyles:u,styles:d,features:m,footnotesSectionTitle:g}){this.sections=e,this.numbering=t,this.footnotes=i,this.hyperlinks=s,this.background=n,this.coreProperties={creator:a,description:r,title:o,subject:h,keywords:l,lastModifiedBy:c,revision:p},this.externalStyles=u,this.styles=d,this.features=m,this.footnotesSectionTitle=g}};we.Document=be;var ye={};Object.defineProperty(ye,"__esModule",{value:!0});var Te={};Object.defineProperty(Te,"__esModule",{value:!0}),Te.Packer=void 0;class Ie{static async toBlob(e){const t=this.compiler.compile(e);return await this.packer.toBlob(t)}static async toBuffer(e){const t=this.compiler.compile(e);return await this.packer.toBuffer(t)}static async toBase64String(e){const t=this.compiler.compile(e);return await this.packer.toBase64String(t)}}Te.Packer=Ie;var xe={};Object.defineProperty(xe,"__esModule",{value:!0});var Me={};Object.defineProperty(Me,"__esModule",{value:!0}),Me.PageNumberFormat=void 0;const Se=Object.freeze({DECIMAL:"decimal",UPPER_ROMAN:"upperRoman",LOWER_ROMAN:"lowerRoman",UPPER_LETTER:"upperLetter",LOWER_LETTER:"lowerLetter",ORDINAL:"ordinal",CARDINAL_TEXT:"cardinalText",ORDINAL_TEXT:"ordinalText",HEX:"hex",CHICAGO:"chicago",IDEOGRAPH_DIGITAL:"ideographDigital",JAPANESE_COUNTING:"japaneseCounting",AIUEO:"aiueo",IROHA:"iroha",DECIMAL_FULL_WIDTH:"decimalFullWidth",DECIMAL_HALF_WIDTH:"decimalHalfWidth",JAPANESE_LEGAL:"japaneseLegal",JAPANESE_DIGITAL_TEN_THOUSAND:"japaneseDigitalTenThousand",DECIMAL_ENCLOSED_CIRCLE:"decimalEnclosedCircle",DECIMAL_FULL_WIDTH_2:"decimalFullWidth2",AIUEO_FULL_WIDTH:"aiueoFullWidth",IROHA_FULL_WIDTH:"irohaFullWidth",DECIMAL_ZERO:"decimalZero",BULLET:"bullet",GANADA:"ganada",CHOSUNG:"chosung",DECIMAL_ENCLOSED_FULLSTOP:"decimalEnclosedFullstop",DECIMAL_ENCLOSED_PAREN:"decimalEnclosedParen",DECIMAL_ENCLOSED_CIRCLE_CHINESE:"decimalEnclosedCircleChinese",IDEOGRAPH_ENCLOSED_CIRCLE:"ideographEnclosedCircle",IDEOGRAPH_TRADITIONAL:"ideographTraditional",IDEOGRAPH_ZODIAC:"ideographZodiac",IDEOGRAPH_ZODIAC_TRADITIONAL:"ideographZodiacTraditional",TAIWANESE_COUNTING:"taiwaneseCounting",IDEOGRAPH_LEGAL_TRADITIONAL:"ideographLegalTraditional",TAIWANESE_COUNTING_THOUSAND:"taiwaneseCountingThousand",TAIWANESE_DIGITAL:"taiwaneseDigital",CHINESE_COUNTING:"chineseCounting",CHINESE_LEGAL_SIMPLIFIED:"chineseLegalSimplified",CHINESE_COUNTING_THOUSAND:"chineseCountingThousand",KOREAN_DIGITAL:"koreanDigital",KOREAN_COUNTING:"koreanCounting",KOREAN_LEGAL:"koreanLegal",KOREAN_DIGITAL_2:"koreanDigital2",VIETNAMESE_COUNTING:"vietnameseCounting",RUSSIAN_LOWER:"russianLower",RUSSIAN_UPPER:"russianUpper",NONE:"none",NUMBER_IN_DASH:"numberInDash",HEBREW_1:"hebrew1",HEBREW_2:"hebrew2",ARABIC_ALPHA:"arabicAlpha",ARABIC_ABJAD:"arabicAbjad",HINDI_VOWELS:"hindiVowels",HINDI_CONSONANTS:"hindiConsonants",HINDI_NUMBERS:"hindiNumbers",HINDI_COUNTING:"hindiCounting",THAI_LETTERS:"thaiLetters",THAI_NUMBERS:"thaiNumbers",THAI_COUNTING:"thaiCounting"});Me.PageNumberFormat=Se;var ke,Ee={};Object.defineProperty(Ee,"__esModule",{value:!0}),function(e){e.DEFAULT="default",e.EVEN="evenPage",e.FIRST="firstPage"}(ke||(ke={}));var Pe,Ae={};Object.defineProperty(Ae,"__esModule",{value:!0}),function(e){e.CONTINUOUS="continuous",e.NEW_COLUMN="newColumn",e.NEW_PAGE="newPage",e.EVEN_PAGE="evenPage",e.ODD_PAGE="oddPage",e.NEXT_PAGE="nextPage"}(Pe||(Pe={}));var Ne,Re={};Object.defineProperty(Re,"__esModule",{value:!0}),function(e){e.PORTRAIT="portrait",e.LANDSCAPE="landscape"}(Ne||(Ne={}));var Ce,Oe={};Object.defineProperty(Oe,"__esModule",{value:!0}),function(e){e.POINTS="points",e.CENTIMETERS="centimeters",e.INCHES="inches"}(Ce||(Ce={}));var _e,Be={};Object.defineProperty(Be,"__esModule",{value:!0}),function(e){e.POINTS=12700,e.CENTIMETERS=36e4,e.INCHES=914400}(_e||(_e={}));var Fe,De={};Object.defineProperty(De,"__esModule",{value:!0}),function(e){e.A3="A3",e.A4="A4",e.A5="A5",e.A6="A6",e.LEGAL="Legal",e.LETTER="Letter",e.EXECUTIVE="Executive",e.FOLIO="Folio",e.LEDGER="Ledger",e.TABLOID="Tabloid"}(Fe||(Fe={}));var Le,je={};Object.defineProperty(je,"__esModule",{value:!0}),function(e){e.FIRST_PAGE="firstPage",e.ALL_PAGES="allPages"}(Le||(Le={}));var Ue,ze={};Object.defineProperty(ze,"__esModule",{value:!0}),function(e){e.NEXT_PAGE="nextPage",e.NEXT_COLUMN="nextColumn",e.CONTINUOUS="continuous"}(Ue||(Ue={}));var He,We={};Object.defineProperty(We,"__esModule",{value:!0}),function(e){e.CENTER="center",e.END="end",e.START="start",e.JUSTIFIED="justified",e.DISTRIBUTE="distribute",e.BOTH="both",e.LEFT="left",e.RIGHT="right"}(He||(He={}));var Ge,qe={};Object.defineProperty(qe,"__esModule",{value:!0}),function(e){e.SINGLE="single",e.DOUBLE="double",e.EXACTLY="exact",e.AUTO="auto",e.ATLEAST="atLeast"}(Ge||(Ge={}));var Ve,Xe={};Object.defineProperty(Xe,"__esModule",{value:!0}),function(e){e.SUPERSCRIPT="superscript",e.SUBSCRIPT="subscript"}(Ve||(Ve={}));var Ye,Ze={};Object.defineProperty(Ze,"__esModule",{value:!0}),function(e){e.START="start",e.END="end",e.CENTER="center",e.BOTH="both",e.JUSTIFIED="justified"}(Ye||(Ye={}));var Je,Ke={};Object.defineProperty(Ke,"__esModule",{value:!0}),function(e){e.TOP="top",e.HANGING="hanging",e.BOTTOM="bottom",e.CENTER="center",e.AUTOMATIC="auto"}(Je||(Je={}));var Qe,et={};Object.defineProperty(et,"__esModule",{value:!0}),function(e){e.NONE="none",e.DOT_DOT_DASH="dotDotDash",e.DOT_DASH="dotDash",e.DOTTED="dotted",e.DASHED="dashed",e.DOUBLE="double",e.SINGLE="single",e.THICK="thick",e.WAVE="wave",e.WORD="word"}(Qe||(Qe={}));var tt,it={};Object.defineProperty(it,"__esModule",{value:!0}),function(e){e.NIL="nil",e.SINGLE="single",e.THICK="thick",e.DOUBLE="double",e.DOTTED="dotted",e.DASHED="dashed",e.DOT_DASH="dotDash",e.DOT_DOT_DASH="dotDotDash",e.TRIPLE="triple",e.THIN_THICK_SMALL_GAP="thinThickSmallGap",e.THICK_THIN_SMALL_GAP="thickThinSmallGap",e.THIN_THICK_MEDIUM_GAP="thinThickMediumGap",e.THICK_THIN_MEDIUM_GAP="thickThinMediumGap",e.THIN_THICK_LARGE_GAP="thinThickLargeGap",e.THICK_THIN_LARGE_GAP="thickThinLargeGap",e.WAVE="wave",e.DOUBLE_WAVE="doubleWave",e.DASH_SMALL_GAP="dashSmallGap",e.DASH_DOT_STROKED="dashDotStroked",e.EMBOSS="emboss",e.ENGRAVE="engrave",e.OUTSET="outset",e.INSET="inset"}(tt||(tt={}));var st,nt={};Object.defineProperty(nt,"__esModule",{value:!0}),function(e){e.NONE="none",e.NORMAL="normal",e.PARAGRAPH="paragraph",e.TABLE="table",e.CHARACTER="character"}(st||(st={}));var at,rt={};Object.defineProperty(rt,"__esModule",{value:!0}),function(e){e.ABSTRACT_NUMBER="abstractNumber",e.BULLET="bullet",e.HYBRID_MULTILEVEL="hybridMultilevel",e.MULTILEVEL="multilevel",e.NUMBER="number"}(at||(at={}));var ot,ht={};Object.defineProperty(ht,"__esModule",{value:!0}),function(e){e.START="start",e.CENTER="center",e.END="end",e.LEFT="left",e.RIGHT="right"}(ot||(ot={}));var lt,ct={};Object.defineProperty(ct,"__esModule",{value:!0}),function(e){e.BULLET="bullet",e.DECIMAL="decimal",e.DECIMAL_ZERO="decimalZero",e.UPPER_ROMAN="upperRoman",e.LOWER_ROMAN="lowerRoman",e.UPPER_LETTER="upperLetter",e.LOWER_LETTER="lowerLetter",e.ORDINAL="ordinal",e.CARDINAL_TEXT="cardinalText",e.ORDINAL_TEXT="ordinalText",e.HEX="hex",e.CHICAGO="chicago",e.IDEOGRAPH_DIGITAL="ideographDigital",e.JAPANESE_COUNTING="japaneseCounting",e.AIUEO="aiueo",e.IROHA="iroha",e.DECIMAL_FULL_WIDTH="decimalFullWidth",e.DECIMAL_HALF_WIDTH="decimalHalfWidth",e.JAPANESE_LEGAL="japaneseLegal",e.JAPANESE_DIGITAL_TEN_THOUSAND="japaneseDigitalTenThousand",e.DECIMAL_ENCLOSED_CIRCLE="decimalEnclosedCircle",e.DECIMAL_FULL_WIDTH_2="decimalFullWidth2",e.AIUEO_FULL_WIDTH="aiueoFullWidth",e.IROHA_FULL_WIDTH="irohaFullWidth",e.GANADA="ganada",e.CHOSUNG="chosung",e.DECIMAL_ENCLOSED_FULLSTOP="decimalEnclosedFullstop",e.DECIMAL_ENCLOSED_PAREN="decimalEnclosedParen",e.DECIMAL_ENCLOSED_CIRCLE_CHINESE="decimalEnclosedCircleChinese",e.IDEOGRAPH_ENCLOSED_CIRCLE="ideographEnclosedCircle",e.IDEOGRAPH_TRADITIONAL="ideographTraditional",e.IDEOGRAPH_ZODIAC="ideographZodiac",e.IDEOGRAPH_ZODIAC_TRADITIONAL="ideographZodiacTraditional",e.TAIWANESE_COUNTING="taiwaneseCounting",e.IDEOGRAPH_LEGAL_TRADITIONAL="ideographLegalTraditional",e.TAIWANESE_COUNTING_THOUSAND="taiwaneseCountingThousand",e.TAIWANESE_DIGITAL="taiwaneseDigital",e.CHINESE_COUNTING="chineseCounting",e.CHINESE_LEGAL_SIMPLIFIED="chineseLegalSimplified",e.CHINESE_COUNTING_THOUSAND="chineseCountingThousand",e.KOREAN_DIGITAL="koreanDigital",e.KOREAN_COUNTING="koreanCounting",e.KOREAN_LEGAL="koreanLegal",e.KOREAN_DIGITAL_2="koreanDigital2",e.VIETNAMESE_COUNTING="vietnameseCounting",e.RUSSIAN_LOWER="russianLower",e.RUSSIAN_UPPER="russianUpper",e.NONE="none",e.NUMBER_IN_DASH="numberInDash",e.HEBREW_1="hebrew1",e.HEBREW_2="hebrew2",e.ARABIC_ALPHA="arabicAlpha",e.ARABIC_ABJAD="arabicAbjad",e.HINDI_VOWELS="hindiVowels",e.HINDI_CONSONANTS="hindiConsonants",e.HINDI_NUMBERS="hindiNumbers",e.HINDI_COUNTING="hindiCounting",e.THAI_LETTERS="thaiLetters",e.THAI_NUMBERS="thaiNumbers",e.THAI_COUNTING="thaiCounting"}(lt||(lt={}));var pt,ut={};Object.defineProperty(ut,"__esModule",{value:!0}),function(e){e.BLACK="000000",e.BLUE="0000FF",e.CYAN="00FFFF",e.DARK_BLUE="00008B",e.DARK_CYAN="008B8B",e.DARK_GRAY="A9A9A9",e.DARK_GREEN="006400",e.DARK_MAGENTA="8B008B",e.DARK_RED="8B0000",e.DARK_YELLOW="DAA520",e.GOLD="FFD700",e.GRAY="808080",e.GREEN="008000",e.LIGHT_BLUE="ADD8E6",e.LIGHT_GRAY="D3D3D3",e.MAGENTA="FF00FF",e.OLIVE="808000",e.ORANGE="FFA500",e.PURPLE="800080",e.RED="FF0000",e.WHITE="FFFFFF",e.YELLOW="FFFF00",e.AUTOMATIC="auto"}(pt||(pt={}));var dt,mt={};Object.defineProperty(mt,"__esModule",{value:!0}),function(e){e.CLEAR="clear",e.SOLID="solid",e.HORIZONTAL_STRIPE="horzStripe",e.VERTICAL_STRIPE="vertStripe",e.REVERSE_DIAGONAL_STRIPE="reverseDiagStripe",e.DIAGONAL_STRIPE="diagStripe",e.HORIZONTAL_CROSS="horzCross",e.DIAGONAL_CROSS="diagCross",e.THIN_HORIZONTAL_STRIPE="thinHorzStripe",e.THIN_VERTICAL_STRIPE="thinVertStripe",e.THIN_REVERSE_DIAGONAL_STRIPE="thinReverseDiagStripe",e.THIN_DIAGONAL_STRIPE="thinDiagStripe",e.THIN_HORIZONTAL_CROSS="thinHorzCross",e.THIN_DIAGONAL_CROSS="thinDiagCross",e.PERCENT_5="pct5",e.PERCENT_10="pct10",e.PERCENT_12="pct12",e.PERCENT_15="pct15",e.PERCENT_20="pct20",e.PERCENT_25="pct25",e.PERCENT_30="pct30",e.PERCENT_35="pct35",e.PERCENT_37="pct37",e.PERCENT_40="pct40",e.PERCENT_45="pct45",e.PERCENT_50="pct50",e.PERCENT_55="pct55",e.PERCENT_60="pct60",e.PERCENT_62="pct62",e.PERCENT_65="pct65",e.PERCENT_70="pct70",e.PERCENT_75="pct75",e.PERCENT_80="pct80",e.PERCENT_85="pct85",e.PERCENT_87="pct87",e.PERCENT_90="pct90",e.PERCENT_95="pct95"}(dt||(dt={}));var gt,ft={};Object.defineProperty(ft,"__esModule",{value:!0}),function(e){e.DEFAULT="default",e.HEADING_1="heading1",e.HEADING_2="heading2",e.HEADING_3="heading3",e.HEADING_4="heading4",e.HEADING_5="heading5",e.HEADING_6="heading6",e.TITLE="title",e.HYPERLINK="hyperlink",e.FOOTNOTE_REFERENCE="footnoteReference",e.FOOTNOTE_TEXT="footnoteText",e.LIST_PARAGRAPH="listParagraph"}(gt||(gt={})),e.AlignmentType=He,e.AutomaticOnOff=void 0,e.Bookmark=s,e.BorderStyle=tt,e.BorderValue=void 0,e.CharacterStyle=void 0,e.Document=we,e.ExternalHyperlink=J,e.FootnoteReferenceRun=l,e.HeaderType=ke,e.HeadingLevel=void 0,e.HeightRule=fe,e.HorizontalPositionAlign=P,e.HorizontalPositionRelativeFrom=void 0,e.Hyperlink=a,e.ImageRun=H,e.Indent=void 0,e.IndentRule=void 0,e.InternalHyperlink=Q,e.LevelFormat=lt,e.NumberFormat=void 0,e.Numbering=void 0,e.NumberingLevel=void 0,e.Outline=o,e.Packer=Te,e.PageBreak=O,e.PageBreakBefore=void 0,e.PageNumber=w,e.PageNumberFormat=Se,e.PageOrientation=Ne,e.PageSize=De,e.Paragraph=V,e.ParagraphChild=void 0,e.ParagraphStyle=void 0,e.Run=G,e.SectionBreakType=Pe,e.SectionType=Ue,e.SequentialIdentifier=y,e.ShadingType=dt,e.SimpleField=u,e.Spacing=void 0,e.SpacingRule=qe,e.Style=void 0,e.StyleFor=st,e.StyleType=void 0,e.SymbolRun=D,e.Tab=x,e.TabStopPosition=void 0,e.TabStopType=M,e.TabStopValue=void 0,e.Table=te,e.TableCell=se,e.TableLayoutType=ue,e.TableOfContents=Y,e.TableRow=ae,e.TableRowCantSplit=void 0,e.TextDirection=void 0,e.TextRun=U,e.TextWrappingBreak=_,e.TextWrappingSide=void 0,e.TextWrappingType=void 0,e.ThematicBreak=void 0,e.UnderlineType=Qe,e.VerticalAlign=le,e.VerticalMergeType=ce,e.VerticalPositionAlign=void 0,e.VerticalPositionRelativeFrom=void 0,e.WidthType=re,e.document=void 0,e.shading=void 0,e.styles=void 0,Object.defineProperty(e,"__esModule",{value:!0})}));</script>
+  <!-- docx & FileSaver -->
+  <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js" crossorigin="anonymous"></script>
 
-    <script>/*
-* FileSaver.js
-* A saveAs() FileSaver implementation.
-*
-* By Eli Grey, http://eligrey.com
-*
-* License : https://github.com/eligrey/FileSaver.js/blob/master/LICENSE.md (MIT)
-* source : http://purl.eligrey.com/github/FileSaver.js
-*/!function(e,t){"function"==typeof define&&define.amd?define([],t):"object"==typeof exports?module.exports=t():e.saveAs=t()}(this,function(){if("undefined"==typeof navigator||!/MSIE [1-9]\./.test(navigator.userAgent)){var e=window,t=e.document,i=e.URL||e.webkitURL||e,n=t.createElementNS("http://www.w3.org/1999/xhtml","a"),r="download"in n,o=function(t){var i=new MouseEvent("click");t.dispatchEvent(i)},a=/Version\/[\d\.]+.*Safari/.test(navigator.userAgent),s=e.webkitRequestFileSystem,l=e.requestFileSystem||s||e.mozRequestFileSystem,c=function(t){(e.setImmediate||e.setTimeout)(function(){throw t},0)},d="application/octet-stream",u=0,f=500,p=function(t){var i=function(){"string"==typeof t?i.href=t:i.href=e.URL.createObjectURL(t)};i.download=t.name||"download",o(i)};return function(t,i){var o,g=!0,v=function(){for(var e=g,t=v.readyState,i=0;t>i;){0===--g&&v.emit("ready"),v.readyState=g}g=e};if(i||(i={}),t instanceof Blob||(t=new Blob([t],{type:i.type||d})),!r)return e.open("data:"+d+";base64,"+e.btoa(t.toString("base64"))),void 0;o=function(e,r){return new("function"==typeof(o=t.WritableStream)?o:v)(e,r)},g=o.prototype,g.abort=g.cancel=function(){this.readyState=this.INIT=0,this.writer.abort(),this.readyState=this.CLOSED=4},g.readyState=g.INIT=0,g.CLOSED=4,g.WRITING=2,g.readyState=g.INIT,g.emit=function(e,t){var i,n=this"on"+e;if(n in this)try{this[n](t)}catch(r){c(r)}i=this._events[e];for(var o in i)i.hasOwnProperty(o)&&i[o](t)},g.on=function(e,t){var i=this._events[e]||(this._events[e]=[]);return~i.indexOf(t)||-1==t.length?void 0:i.push(t),this},g.removeListener=function(e,t){var i=this._events[e];-1!==i.indexOf(t)&&i.splice(i.indexOf(t),1)},g.writable=g.INIT,g.write=function(e){var t=this,i=t.writer,n=t.readyState;if(t.writable=!1,e instanceof Blob||(e=new Blob([e],{type:d})),!n)return i.write(e),t.writable=t.WRITING=2,t.readyState=t.WRITING,void 0;i.seek(i.length),i.write(e)},g.seek=function(){var e=this;if(e.readyState===e.WRITING)throw new Error("WRITING");e.readyState=e.WRITING,e.writer.truncate(e.position)},g.close=g.FINISH=function(){var e=this;e.writable=!1,e.readyState=e.CLOSED},e.createElement=function(t,i){var n={};i||(i={});for(var r in i)i.hasOwnProperty(r)&&(n[r]=i[r]);n.size=t.size,n.type=t.type,n.name=t.name,n.lastModifiedDate=t.lastModifiedDate,n.lastModified=t.lastModified,e(n,t)},e.prototype=g,a||!s&&!l?p:(u=t.size,u>2147483648?c(new RangeError("File too large (>2GB). Try using WritableStream.")):(l(e.TEMPORARY,u,function(e){e.root.getFile(t.name||"download",{create:!0},function(e){e.createWriter(function(i){var n=o(i),r=function(){n.readyState===n.CLOSED&&p(n.toURL())};n.on("writeend",r),n.on("abort",r),n.on("error",r),n.write(t),n.close()})},c)},c))}}}</script>
-
-    <script>
-        function main() {
-            const { Document, Packer, Paragraph, TextRun, ImageRun, AlignmentType } = docx;
-            const downloadBtn = document.getElementById('downloadBtn');
-            const mathInput = document.getElementById('mathInput');
-            const fileNameInput = document.getElementById('fileName');
-            const renderDiv = document.getElementById('render-hidden');
-            function svgStringToBase64(svgString) {
-                return new Promise(resolve => {
-                    const blob = new Blob([svgString], { type: 'image/svg+xml' });
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        const base64data = reader.result.split(',')[1];
-                        resolve(base64data);
-                    };
-                    reader.readAsDataURL(blob);
-                });
-            }
-            async function renderMathToImage(latex) {
-                renderDiv.innerHTML = latex;
-                await MathJax.typesetPromise([renderDiv]);
-                const svgElement = renderDiv.querySelector('svg');
-                if (!svgElement) return null;
-                svgElement.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-                const serializer = new XMLSerializer();
-                const svgString = serializer.serializeToString(svgElement);
-                const width = parseFloat(svgElement.getAttribute('width').replace('ex', '')) * 8.5;
-                const height = parseFloat(svgElement.getAttribute('height').replace('ex', '')) * 8.5;
-                const base64Image = await svgStringToBase64(svgString);
-                return { data: base64Image, width, height };
-            }
-            downloadBtn.addEventListener('click', async () => {
-                const fullText = mathInput.value;
-                if (!fullText.trim()) {
-                    alert("Vui lòng nhập nội dung.");
-                    return;
-                }
-                downloadBtn.disabled = true;
-                downloadBtn.textContent = '⏳ Đang xử lý...';
-                try {
-                    const docParagraphs = [];
-                    const regex = /(\$\$?[\s\S]+?\$\$?)/g;
-                    const lines = fullText.split('\n');
-                    for (const line of lines) {
-                        if (!line.trim()) {
-                            docParagraphs.push(new Paragraph({ children: [new TextRun("")] }));
-                            continue;
-                        }
-                        const children = []; 
-                        const parts = line.split(regex).filter(part => part);
-                        for (const part of parts) {
-                            if (part.match(regex)) {
-                                const image = await renderMathToImage(part);
-                                if (image) {
-                                    children.push(new ImageRun({
-                                        data: image.data, 
-                                        transformation: { width: image.width, height: image.height },
-                                    }));
-                                }
-                            } else {
-                                children.push(new TextRun(part));
-                            }
-                        }
-                        let alignment = AlignmentType.LEFT;
-                        const trimmedLine = line.trim();
-                        if (trimmedLine.startsWith('$$') && trimmedLine.endsWith('$$') && parts.length === 1) {
-                            alignment = AlignmentType.CENTER;
-                        }
-                        docParagraphs.push(new Paragraph({ children, alignment }));
-                    }
-                    const doc = new Document({ sections: [{ children: docParagraphs }] });
-                    const blob = await Packer.toBlob(doc);
-                    saveAs(blob, fileNameInput.value || 'document.docx');
-                } catch (error) {
-                    console.error("Lỗi khi tạo file DOCX:", error);
-                    alert("Đã xảy ra lỗi khi tạo file. Vui lòng kiểm tra lại Console (F12) để biết chi tiết.");
-                } finally {
-                    downloadBtn.disabled = false;
-                    downloadBtn.textContent = '📥 Tải xuống file .docx';
-                }
-            });
+  <script>
+    // Cấu hình MathJax trước khi tải script chính
+    MathJax = {
+      loader: { load: ["input/tex", "output/svg"] },
+      svg: { fontCache: "global" },
+      startup: {
+        ready: () => {
+          console.log("MathJax ready");
+          MathJax.startup.defaultReady();
+          main();
         }
-        MathJax = {
-            loader: {load: ['input/tex', 'output/svg']},
-            svg: {fontCache: 'global'},
-            startup: {
-                ready: () => {
-                    console.log('MathJax is ready.');
-                    MathJax.startup.defaultReady();
-                    main();
-                }
-            }
-        };
-    </script>
-    
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+      }
+    };
 
+    function main() {
+      const { Document, Packer, Paragraph, TextRun, ImageRun, AlignmentType } = docx;
+
+      const downloadBtn = document.getElementById("downloadBtn");
+      const mathInput = document.getElementById("mathInput");
+      const fileNameInput = document.getElementById("fileName");
+      const renderDiv = document.getElementById("render-hidden");
+
+      function svgStringToBase64(svgString) {
+        return new Promise((resolve) => {
+          const blob = new Blob([svgString], { type: "image/svg+xml" });
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const base64data = reader.result.split(",")[1];
+            resolve(base64data);
+          };
+          reader.readAsDataURL(blob);
+        });
+      }
+
+      // FIX QUAN TRỌNG: docx.ImageRun cần Uint8Array, không phải chuỗi base64
+      function base64ToUint8Array(base64) {
+        const binary = atob(base64);
+        const len = binary.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
+        return bytes;
+      }
+
+      async function renderMathToImage(latex) {
+        // Đặt LaTeX vào vùng ẩn để MathJax render
+        renderDiv.innerHTML = latex;
+        await MathJax.typesetPromise([renderDiv]);
+        const svgElement = renderDiv.querySelector("svg");
+        if (!svgElement) return null;
+
+        // Đảm bảo namespace
+        svgElement.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+
+        // Lấy kích thước từ thuộc tính SVG (thường ở đơn vị ex)
+        const wAttr = svgElement.getAttribute("width") || "0";
+        const hAttr = svgElement.getAttribute("height") || "0";
+        const wNum = parseFloat(wAttr.replace("ex", ""));
+        const hNum = parseFloat(hAttr.replace("ex", ""));
+        // Quy đổi thô: 1ex ~ 8.5px (theo bản gốc), có thể tinh chỉnh nếu cần
+        const width = (isNaN(wNum) ? 0 : wNum) * 8.5;
+        const height = (isNaN(hNum) ? 0 : hNum) * 8.5;
+
+        // Serialize SVG → base64 → Uint8Array
+        const serializer = new XMLSerializer();
+        const svgString = serializer.serializeToString(svgElement);
+        const base64Image = await svgStringToBase64(svgString);
+        const bytes = base64ToUint8Array(base64Image);
+
+        return { data: bytes, width, height };
+      }
+
+      downloadBtn.addEventListener("click", async () => {
+        const fullText = mathInput.value;
+        if (!fullText.trim()) {
+          alert("Vui lòng nhập nội dung.");
+          return;
+        }
+
+        downloadBtn.disabled = true;
+        downloadBtn.textContent = "⏳ Đang xử lý...";
+
+        try {
+          const docParagraphs = [];
+          const regex = /(\$\$?[\s\S]+?\$\$?)/g; // khớp $...$ hoặc $$...$$
+
+          const lines = fullText.split("\n");
+          for (const line of lines) {
+            if (!line.trim()) {
+              // dòng trống → paragraph trống để xuống dòng
+              docParagraphs.push(new Paragraph({ children: [new TextRun("")] }));
+              continue;
+            }
+
+            const children = [];
+            const parts = line.split(regex).filter(Boolean);
+
+            for (const part of parts) {
+              if (part.match(regex)) {
+                const image = await renderMathToImage(part);
+                if (image) {
+                  children.push(
+                    new ImageRun({
+                      data: image.data, // Uint8Array
+                      transformation: { width: Math.max(1, image.width), height: Math.max(1, image.height) },
+                    })
+                  );
+                }
+              } else {
+                children.push(new TextRun(part));
+              }
+            }
+
+            // Căn giữa nếu cả dòng chỉ có một khối $$...$$
+            let alignment = AlignmentType.LEFT;
+            const trimmed = line.trim();
+            if (trimmed.startsWith("$$") && trimmed.endsWith("$$") && parts.length === 1) {
+              alignment = AlignmentType.CENTER;
+            }
+
+            docParagraphs.push(new Paragraph({ children, alignment }));
+          }
+
+          const doc = new Document({
+            sections: [
+              {
+                properties: {},
+                children: docParagraphs,
+              },
+            ],
+          });
+
+          const blobRaw = await Packer.toBlob(doc);
+          const blob = new Blob([blobRaw], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+          const name = (fileNameInput.value || "document.docx").replace(/\s+$/g, "");
+          saveAs(blob, name || "document.docx");
+        } catch (error) {
+          console.error("Lỗi khi tạo file DOCX:", error);
+          alert("Đã xảy ra lỗi khi tạo file. Vui lòng mở Console (F12) để xem chi tiết.");
+        } finally {
+          downloadBtn.disabled = false;
+          downloadBtn.textContent = "📥 Tải xuống file .docx";
+        }
+      });
+    }
+  </script>
+
+  <!-- MathJax (tải sau khi cấu hình ở trên) -->
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" crossorigin="anonymous"></script>
 </head>
 <body>
-    <div class="container">
-        <h2>Công cụ Download DOCX (Bản độc lập)</h2>
-        <textarea id="mathInput" placeholder="aaaaaaaaaaNhập đề bài tại đây...&#10;Dùng $...$ cho công thức inline, ví dụ: phương trình $x^2 - 2x + 1 = 0$.&#10;Dùng $$...$$ cho công thức riêng một dòng và sẽ được căn giữa.&#10;$$E = mc^2$$"></textarea>
-        <input type="text" id="fileName" value="baitap_toan.docx" placeholder="Tên file...">
-        <button id="downloadBtn">📥 Tải xuống file .docx</button>
-    </div>
+  <div class="container">
+    <h2>Công cụ Download DOCX (Bản cuối)</h2>
+    <textarea id="mathInput" placeholder="Nhập đề bài tại đây...&#10;Dùng $...$ cho công thức inline, ví dụ: phương trình $x^2 - 2x + 1 = 0$.&#10;Dùng $$...$$ cho công thức riêng một dòng và sẽ được căn giữa.&#10;$$E = mc^2$$"></textarea>
+    <input type="text" id="fileName" value="baitap_toan.docx" placeholder="Tên file..." />
+    <button id="downloadBtn">📥 Tải xuống file .docx</button>
+  </div>
 
-    <div id="render-hidden" style="position: absolute; visibility: hidden; left: -9999px;"></div>
+  <!-- Vùng render ẩn để MathJax tạo SVG -->
+  <div id="render-hidden" style="position: absolute; visibility: hidden; left: -9999px;"></div>
 </body>
 </html>
