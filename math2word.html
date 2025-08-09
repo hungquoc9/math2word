@@ -17,15 +17,30 @@ button { padding: 10px 20px; font-size: 16px; }
 <button id="btn-export">Tải file Word Equation</button>
 
 <script>
+// Escape ký tự XML đặc biệt
+function escapeXml(unsafe) {
+    return unsafe.replace(/[<>&'"]/g, function (c) {
+        switch (c) {
+            case '<': return '&lt;';
+            case '>': return '&gt;';
+            case '&': return '&amp;';
+            case '\'': return '&apos;';
+            case '"': return '&quot;';
+        }
+    });
+}
+
 document.getElementById('btn-export').addEventListener('click', function(){
-    let latex = document.getElementById('math-input').value.trim();
-    if (!latex) { alert("Vui lòng nhập LaTeX"); return; }
+    try {
+        let latex = document.getElementById('math-input').value.trim();
+        if (!latex) { alert("Vui lòng nhập LaTeX"); return; }
 
-    // Chuyển LaTeX → MathML
-    let mathml = latex2mathml(latex);
+        // Chuyển LaTeX → MathML
+        let mathml = latex2mathml(latex);
+        mathml = escapeXml(mathml); // escape để tránh XML lỗi
 
-    // Word 2003 XML đầy đủ
-    let wordXml =
+        // Word 2003 XML đầy đủ
+        let wordXml =
 `<?xml version="1.0" encoding="UTF-8"?>
 <?mso-application progid="Word.Document"?>
 <w:wordDocument xmlns:w="http://schemas.microsoft.com/office/word/2003/wordml"
@@ -41,20 +56,27 @@ ${mathml}
 </w:body>
 </w:wordDocument>`;
 
-    // Tạo blob để tải
-    let blob = new Blob([wordXml], { type: 'application/msword' });
-    let url = URL.createObjectURL(blob);
+        console.log("Generated Word XML:", wordXml);
 
-    // Tạo link tải và click
-    let a = document.createElement('a');
-    a.href = url;
-    a.download = 'BaiToan.doc';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+        // Tạo blob để tải
+        let blob = new Blob([wordXml], { type: 'application/msword' });
+        let url = URL.createObjectURL(blob);
 
-    // Giải phóng bộ nhớ
-    URL.revokeObjectURL(url);
+        // Tạo link tải và click
+        let a = document.createElement('a');
+        a.href = url;
+        a.download = 'BaiToan.doc';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        // Giải phóng bộ nhớ
+        URL.revokeObjectURL(url);
+
+    } catch (err) {
+        console.error("Lỗi khi tạo file Word:", err);
+        alert("Có lỗi khi tạo file Word. Xem console để biết chi tiết.");
+    }
 });
 </script>
 
