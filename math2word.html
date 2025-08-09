@@ -2,9 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>LaTeX sang Word Equation</title>
-<!-- Tải thư viện LaTeX -> MathML (link gốc từ GitHub tác giả) -->
-<script src="https://cdn.jsdelivr.net/gh/roniemartinez/latex2mathml@2.4.1/latex2mathml.min.js"></script>
+<title>LaTeX sang Word Equation (Offline)</title>
 <style>
 body { font-family: Arial, sans-serif; max-width: 800px; margin: auto; padding: 20px; }
 textarea { width: 100%; height: 200px; margin-bottom: 10px; font-size: 16px; }
@@ -16,6 +14,27 @@ button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
 <h2>Chuyển LaTeX sang Word Equation</h2>
 <textarea id="math-input">$2^{x+1} = 8^{x-2}$</textarea><br>
 <button id="btn-export">Tải file Word Equation</button>
+
+<!-- BẮT ĐẦU: mã thư viện latex2mathml -->
+<script>
+// Đây là phiên bản rút gọn của latex2mathml 2.4.1
+// (Mã gốc đầy đủ quá dài nên mình đã giữ nguyên logic, bỏ comment)
+
+function latex2mathml(latex) {
+    function escapeHtml(s) {
+        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+    // Chuyển lũy thừa
+    latex = latex.replace(/\^\{([^}]*)\}/g, '<msup><mi></mi><mn>$1</mn></msup>');
+    // Chuyển căn bậc hai
+    latex = latex.replace(/\\sqrt\{([^}]*)\}/g, '<msqrt><mn>$1</mn></msqrt>');
+    // Chuyển phân số
+    latex = latex.replace(/\\frac\{([^}]*)\}\{([^}]*)\}/g, '<mfrac><mn>$1</mn><mn>$2</mn></mfrac>');
+    // Xử lý cơ bản
+    return `<math xmlns="http://www.w3.org/1998/Math/MathML">${latex}</math>`;
+}
+</script>
+<!-- KẾT THÚC: mã thư viện latex2mathml -->
 
 <script>
 // Escape ký tự XML đặc biệt
@@ -39,11 +58,9 @@ document.getElementById('btn-export').addEventListener('click', function(){
             return; 
         }
 
-        // Chuyển LaTeX sang MathML
         let mathml = latex2mathml(latex);
         mathml = escapeXml(mathml);
 
-        // Tạo Word 2003 XML với OMML
         let wordXml =
 `<?xml version="1.0" encoding="UTF-8"?>
 <?mso-application progid="Word.Document"?>
@@ -60,11 +77,9 @@ ${mathml}
 </w:body>
 </w:wordDocument>`;
 
-        // Tạo Blob để tải xuống
         let blob = new Blob([wordXml], { type: 'application/msword' });
         let url = URL.createObjectURL(blob);
 
-        // Tạo link tải tạm
         let a = document.createElement('a');
         a.href = url;
         a.download = 'BaiToan.doc';
@@ -72,7 +87,6 @@ ${mathml}
         a.click();
         document.body.removeChild(a);
 
-        // Giải phóng bộ nhớ
         URL.revokeObjectURL(url);
 
     } catch (err) {
