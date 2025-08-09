@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <title>LaTeX sang Word Equation</title>
-<!-- Thư viện LaTeX -> MathML -->
-<script src="https://unpkg.com/latex2mathml@2.4.1/dist/latex2mathml.min.js"></script>
+<!-- Tải thư viện LaTeX -> MathML (link gốc từ GitHub tác giả) -->
+<script src="https://cdn.jsdelivr.net/gh/roniemartinez/latex2mathml@2.4.1/latex2mathml.min.js"></script>
 <style>
 body { font-family: Arial, sans-serif; max-width: 800px; margin: auto; padding: 20px; }
-textarea { width: 100%; height: 200px; margin-bottom: 10px; }
-button { padding: 10px 20px; font-size: 16px; }
+textarea { width: 100%; height: 200px; margin-bottom: 10px; font-size: 16px; }
+button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -18,6 +18,7 @@ button { padding: 10px 20px; font-size: 16px; }
 <button id="btn-export">Tải file Word Equation</button>
 
 <script>
+// Escape ký tự XML đặc biệt
 function escapeXml(unsafe) {
     return unsafe.replace(/[<>&'"]/g, function (c) {
         switch (c) {
@@ -33,11 +34,16 @@ function escapeXml(unsafe) {
 document.getElementById('btn-export').addEventListener('click', function(){
     try {
         let latex = document.getElementById('math-input').value.trim();
-        if (!latex) { alert("Vui lòng nhập LaTeX"); return; }
+        if (!latex) { 
+            alert("Vui lòng nhập công thức LaTeX"); 
+            return; 
+        }
 
-        let mathml = latex2mathml(latex); // Thư viện đã load từ CDN
+        // Chuyển LaTeX sang MathML
+        let mathml = latex2mathml(latex);
         mathml = escapeXml(mathml);
 
+        // Tạo Word 2003 XML với OMML
         let wordXml =
 `<?xml version="1.0" encoding="UTF-8"?>
 <?mso-application progid="Word.Document"?>
@@ -54,9 +60,11 @@ ${mathml}
 </w:body>
 </w:wordDocument>`;
 
+        // Tạo Blob để tải xuống
         let blob = new Blob([wordXml], { type: 'application/msword' });
         let url = URL.createObjectURL(blob);
 
+        // Tạo link tải tạm
         let a = document.createElement('a');
         a.href = url;
         a.download = 'BaiToan.doc';
@@ -64,6 +72,7 @@ ${mathml}
         a.click();
         document.body.removeChild(a);
 
+        // Giải phóng bộ nhớ
         URL.revokeObjectURL(url);
 
     } catch (err) {
