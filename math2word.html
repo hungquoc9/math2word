@@ -3,17 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chuyển Toán học sang DOCX (Hoạt động trên GitHub)</title>
-
-    <script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <script>
-    MathJax = {
-        loader: {load: ['input/tex', 'output/svg']},
-        svg: { fontCache: 'global' }
-    };
-    </script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <title>Chuyển Toán học sang DOCX (Bản ổn định)</title>
 
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 20px; background-color: #f4f4f9; margin: 0; }
@@ -25,9 +15,136 @@
         button:hover { background-color: #218838; }
         button:disabled { background-color: #ccc; cursor: not-allowed; }
     </style>
+    
+    <script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <script>
+        // Bọc toàn bộ logic của chúng ta vào một hàm, ví dụ là main()
+        function main() {
+            const { Document, Packer, Paragraph, TextRun, ImageRun, AlignmentType } = docx;
+
+            const downloadBtn = document.getElementById('downloadBtn');
+            const mathInput = document.getElementById('mathInput');
+            const fileNameInput = document.getElementById('fileName');
+            const renderDiv = document.getElementById('render-hidden');
+
+            function svgStringToBase64(svgString) {
+                return new Promise(resolve => {
+                    const blob = new Blob([svgString], { type: 'image/svg+xml' });
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        const base64data = reader.result.split(',')[1];
+                        resolve(base64data);
+                    };
+                    reader.readAsDataURL(blob);
+                });
+            }
+
+            async function renderMathToImage(latex) {
+                renderDiv.innerHTML = latex;
+                await MathJax.typesetPromise([renderDiv]);
+                const svgElement = renderDiv.querySelector('svg');
+                if (!svgElement) return null;
+
+                svgElement.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+                
+                const serializer = new XMLSerializer();
+                const svgString = serializer.serializeToString(svgElement);
+                
+                const width = parseFloat(svgElement.getAttribute('width').replace('ex', '')) * 8.5;
+                const height = parseFloat(svgElement.getAttribute('height').replace('ex', '')) * 8.5;
+
+                const base64Image = await svgStringToBase64(svgString);
+
+                return {
+                    data: base64Image,
+                    width,
+                    height,
+                };
+            }
+
+            downloadBtn.addEventListener('click', async () => {
+                const fullText = mathInput.value;
+                if (!fullText.trim()) {
+                    alert("Vui lòng nhập nội dung.");
+                    return;
+                }
+
+                downloadBtn.disabled = true;
+                downloadBtn.textContent = '⏳ Đang xử lý...';
+
+                try {
+                    const docParagraphs = [];
+                    const regex = /(\$\$?[\s\S]+?\$\$?)/g;
+                    const lines = fullText.split('\n');
+
+                    for (const line of lines) {
+                        if (!line.trim()) {
+                            docParagraphs.push(new Paragraph({ children: [new TextRun("")] }));
+                            continue;
+                        }
+
+                        const children = []; 
+                        const parts = line.split(regex).filter(part => part);
+
+                        for (const part of parts) {
+                            if (part.match(regex)) {
+                                const image = await renderMathToImage(part);
+                                if (image) {
+                                    children.push(new ImageRun({
+                                        data: image.data, 
+                                        transformation: { width: image.width, height: image.height },
+                                    }));
+                                }
+                            } else {
+                                children.push(new TextRun(part));
+                            }
+                        }
+
+                        let alignment = AlignmentType.LEFT;
+                        const trimmedLine = line.trim();
+                        if (trimmedLine.startsWith('$$') && trimmedLine.endsWith('$$') && parts.length === 1) {
+                            alignment = AlignmentType.CENTER;
+                        }
+                        
+                        docParagraphs.push(new Paragraph({ children, alignment }));
+                    }
+
+                    const doc = new Document({ sections: [{ children: docParagraphs }] });
+                    const blob = await Packer.toBlob(doc);
+                    saveAs(blob, fileNameInput.value || 'document.docx');
+
+                } catch (error) {
+                    console.error("Lỗi khi tạo file DOCX:", error);
+                    alert("Đã xảy ra lỗi khi tạo file. Vui lòng kiểm tra lại Console (F12) để biết chi tiết.");
+                } finally {
+                    downloadBtn.disabled = false;
+                    downloadBtn.textContent = '📥 Tải xuống file .docx';
+                }
+            });
+        }
+
+        // Cấu hình cho MathJax biết phải làm gì khi nó sẵn sàng
+        MathJax = {
+            loader: {load: ['input/tex', 'output/svg']},
+            svg: {fontCache: 'global'},
+            startup: {
+                // Khi MathJax sẵn sàng, nó sẽ gọi hàm này
+                ready: () => {
+                    console.log('MathJax is ready.');
+                    MathJax.startup.defaultReady();
+                    // Bây giờ mới là lúc an toàn để chạy code của chúng ta
+                    main();
+                }
+            }
+        };
+    </script>
+    
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
 </head>
 <body>
-
     <div class="container">
         <h2>Công cụ Download DOCX (Bản ổn định)</h2>
         <textarea id="mathInput" placeholder="Nhập đề bài tại đây...&#10;Dùng $...$ cho công thức inline, ví dụ: phương trình $x^2 - 2x + 1 = 0$.&#10;Dùng $$...$$ cho công thức riêng một dòng và sẽ được căn giữa.&#10;$$E = mc^2$$"></textarea>
@@ -36,124 +153,5 @@
     </div>
 
     <div id="render-hidden" style="position: absolute; visibility: hidden; left: -9999px;"></div>
-
-    <script>
-        const { Document, Packer, Paragraph, TextRun, ImageRun, AlignmentType } = docx;
-
-        const downloadBtn = document.getElementById('downloadBtn');
-        const mathInput = document.getElementById('mathInput');
-        const fileNameInput = document.getElementById('fileName');
-        const renderDiv = document.getElementById('render-hidden');
-
-        // *** ĐÂY LÀ THAY ĐỔI QUAN TRỌNG NHẤT ***
-        // Hàm chuyển đổi SVG sang ảnh Base64 một cách an toàn bằng FileReader
-        function svgStringToBase64(svgString) {
-            return new Promise(resolve => {
-                const blob = new Blob([svgString], { type: 'image/svg+xml' });
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    // reader.result là một Data URL đầy đủ (VD: "data:image/svg+xml;base64,PHN2Zy...")
-                    // Chúng ta cần tách để lấy phần Base64 tinh khiết ở sau dấu phẩy.
-                    const base64data = reader.result.split(',')[1];
-                    resolve(base64data);
-                };
-                reader.readAsDataURL(blob);
-            });
-        }
-        
-        // Hàm render một công thức LaTeX thành ảnh
-        async function renderMathToImage(latex) {
-            renderDiv.innerHTML = latex;
-            await MathJax.typesetPromise([renderDiv]);
-            const svgElement = renderDiv.querySelector('svg');
-            if (!svgElement) return null;
-
-            svgElement.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-            
-            const serializer = new XMLSerializer();
-            const svgString = serializer.serializeToString(svgElement);
-            
-            const width = parseFloat(svgElement.getAttribute('width').replace('ex', '')) * 8.5;
-            const height = parseFloat(svgElement.getAttribute('height').replace('ex', '')) * 8.5;
-
-            // Chờ hàm chuyển đổi mới hoàn thành
-            const base64Image = await svgStringToBase64(svgString);
-
-            return {
-                data: base64Image, // Dữ liệu bây giờ là Base64 tinh khiết
-                width,
-                height,
-            };
-        }
-
-        downloadBtn.addEventListener('click', async () => {
-            const fullText = mathInput.value;
-            if (!fullText.trim()) {
-                alert("Vui lòng nhập nội dung.");
-                return;
-            }
-
-            downloadBtn.disabled = true;
-            downloadBtn.textContent = '⏳ Đang xử lý...';
-
-            try {
-                const docParagraphs = [];
-                const regex = /(\$\$?[\s\S]+?\$\$?)/g;
-                const lines = fullText.split('\n');
-
-                for (const line of lines) {
-                    if (!line.trim()) {
-                        docParagraphs.push(new Paragraph({ children: [new TextRun("")] }));
-                        continue;
-                    }
-
-                    const children = []; 
-                    const parts = line.split(regex).filter(part => part);
-
-                    for (const part of parts) {
-                        if (part.match(regex)) {
-                            const image = await renderMathToImage(part);
-                            if (image) {
-                                // Thư viện docx cần dữ liệu Base64 tinh khiết, hàm mới đã cung cấp đúng định dạng
-                                children.push(new ImageRun({
-                                    data: image.data, 
-                                    transformation: {
-                                        width: image.width,
-                                        height: image.height,
-                                    },
-                                }));
-                            }
-                        } else {
-                            children.push(new TextRun(part));
-                        }
-                    }
-
-                    let alignment = AlignmentType.LEFT;
-                    const trimmedLine = line.trim();
-                    if (trimmedLine.startsWith('$$') && trimmedLine.endsWith('$$') && parts.length === 1) {
-                        alignment = AlignmentType.CENTER;
-                    }
-                    
-                    docParagraphs.push(new Paragraph({ children, alignment }));
-                }
-
-                const doc = new Document({
-                    sections: [{
-                        children: docParagraphs,
-                    }],
-                });
-
-                const blob = await Packer.toBlob(doc);
-                saveAs(blob, fileNameInput.value || 'document.docx');
-
-            } catch (error) {
-                console.error("Lỗi khi tạo file DOCX:", error);
-                alert("Đã xảy ra lỗi khi tạo file. Vui lòng kiểm tra lại Console (F12) để biết chi tiết.");
-            } finally {
-                downloadBtn.disabled = false;
-                downloadBtn.textContent = '📥 Tải xuống file .docx';
-            }
-        });
-    </script>
 </body>
 </html>
