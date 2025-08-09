@@ -108,9 +108,8 @@
         const fileNameInput = document.getElementById('fileName');
         const renderDiv = document.getElementById('render-hidden');
 
-        // Hàm chuyển đổi chuỗi UTF-8 sang Base64 một cách an toàn
-        function utf8_to_b64(str) {
-            return window.btoa(unescape(encodeURIComponent(str)));
+        function utf8_to_b64( str ) {
+            return window.btoa(unescape(encodeURIComponent( str )));
         }
 
         downloadBtn.addEventListener('click', async () => {
@@ -124,66 +123,54 @@
             downloadBtn.textContent = 'Đang xử lý...';
 
             try {
-                // Tách văn bản thành các đoạn thường và đoạn công thức
                 const regex = /(\$\$?[\s\S]*?\$\$?)/g;
                 const parts = fullText.split(regex).filter(part => part);
-
-                const paragraphs = [];
+                const runs = [];
 
                 for (const part of parts) {
-                    const runs = [];
-                    // Xử lý các xuống dòng trong phần văn bản thường
-                    const textParts = part.split('\n');
+                    if (part.match(regex)) {
+                        // Xử lý công thức toán
+                        renderDiv.innerHTML = part;
+                        await MathJax.typesetPromise([renderDiv]);
+                        const svgElement = renderDiv.querySelector('svg');
 
-                    for (let i = 0; i < textParts.length; i++) {
-                        const textSegment = textParts[i];
+                        if (svgElement) {
+                            const serializer = new XMLSerializer();
+                            const svgString = serializer.serializeToString(svgElement);
+                            const base64Image = utf8_to_b64(svgString);
 
-                        if (textSegment.match(regex)) {
-                            // Đây là công thức toán
-                            renderDiv.innerHTML = textSegment;
-                            await MathJax.typesetPromise([renderDiv]);
-                            const svgElement = renderDiv.querySelector('svg');
+                            const width = parseFloat(svgElement.getAttribute('width').replace('ex', '')) * 9;
+                            const height = parseFloat(svgElement.getAttribute('height').replace('ex', '')) * 9;
 
-                            if (svgElement) {
-                                // Tăng kích thước font chữ của SVG để ảnh rõ nét hơn
-                                svgElement.setAttribute('font-size', '20px');
-
-                                const serializer = new XMLSerializer();
-                                const svgString = serializer.serializeToString(svgElement);
-                                
-                                // Chuyển SVG sang base64 data URL
-                                const base64Image = utf8_to_b64(svgString);
-
-                                // Ước tính kích thước ảnh
-                                const width = parseFloat(svgElement.getAttribute('width').replace('ex', '')) * 10; 
-                                const height = parseFloat(svgElement.getAttribute('height').replace('ex', '')) * 10;
-
-                                runs.push(
-                                    new ImageRun({
-                                        data: base64Image, // *** SỬA LỖI TẠI ĐÂY ***
-                                        transformation: {
-                                            width: width,
-                                            height: height,
-                                        },
-                                    })
-                                );
-                            }
-                        } else {
-                            // Đây là văn bản thường
-                            runs.push(new TextRun(textSegment));
+                            runs.push(
+                                new ImageRun({
+                                    data: base64Image,
+                                    transformation: {
+                                        width: width,
+                                        height: height,
+                                    },
+                                })
+                            );
                         }
-
-                        // Thêm ngắt dòng (trừ dòng cuối cùng của một phần)
-                        if (i < textParts.length - 1) {
-                            runs.push(new TextRun({ text: "", break: 1 }));
+                    } else {
+                        // Xử lý văn bản thường, bao gồm cả ký tự xuống dòng
+                        const textParts = part.split('\n');
+                        for (let i = 0; i < textParts.length; i++) {
+                            runs.push(new TextRun(textParts[i]));
+                            if (i < textParts.length - 1) {
+                                runs.push(new TextRun({ text: "", break: 1 }));
+                            }
                         }
                     }
-                    paragraphs.push(new Paragraph({ children: runs }));
                 }
                 
                 const doc = new Document({
                     sections: [{
-                        children: paragraphs,
+                        children: [
+                            new Paragraph({
+                                children: runs,
+                            }),
+                        ],
                     }],
                 });
 
@@ -192,7 +179,7 @@
 
             } catch (error) {
                 console.error("Lỗi khi tạo file docx:", error);
-                alert("Đã xảy ra lỗi. Vui lòng kiểm tra lại công thức hoặc thử lại.");
+                alert("Đã xảy ra lỗi nghiêm trọng. Vui lòng chụp lại màn hình console (nhấn F12) và gửi lại nếu có thể.");
             } finally {
                 downloadBtn.disabled = false;
                 downloadBtn.textContent = 'Tải file .docx';
