@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chuyển Toán học sang DOCX (Bản ổn định)</title>
+    <title>Chuyển Toán học sang DOCX (Bản cuối)</title>
 
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 20px; background-color: #f4f4f9; margin: 0; }
@@ -16,11 +16,10 @@
         button:disabled { background-color: #ccc; cursor: not-allowed; }
     </style>
     
-    <script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
     <script>
-        // Bọc toàn bộ logic của chúng ta vào một hàm, ví dụ là main()
         function main() {
             const { Document, Packer, Paragraph, TextRun, ImageRun, AlignmentType } = docx;
 
@@ -125,16 +124,13 @@
             });
         }
 
-        // Cấu hình cho MathJax biết phải làm gì khi nó sẵn sàng
         MathJax = {
             loader: {load: ['input/tex', 'output/svg']},
             svg: {fontCache: 'global'},
             startup: {
-                // Khi MathJax sẵn sàng, nó sẽ gọi hàm này
                 ready: () => {
                     console.log('MathJax is ready.');
                     MathJax.startup.defaultReady();
-                    // Bây giờ mới là lúc an toàn để chạy code của chúng ta
                     main();
                 }
             }
@@ -146,8 +142,8 @@
 </head>
 <body>
     <div class="container">
-        <h2>Công cụ Download DOCX (Bản ổn định)</h2>
-        <textarea id="mathInput" placeholder="0000Nhập đề bài tại đây...&#10;Dùng $...$ cho công thức inline, ví dụ: phương trình $x^2 - 2x + 1 = 0$.&#10;Dùng $$...$$ cho công thức riêng một dòng và sẽ được căn giữa.&#10;$$E = mc^2$$"></textarea>
+        <h2>Công cụ Download DOCX (Bản cuối)</h2>
+        <textarea id="mathInput" placeholder="11111Nhập đề bài tại đây...&#10;Dùng $...$ cho công thức inline, ví dụ: phương trình $x^2 - 2x + 1 = 0$.&#10;Dùng $$...$$ cho công thức riêng một dòng và sẽ được căn giữa.&#10;$$E = mc^2$$"></textarea>
         <input type="text" id="fileName" value="baitap_toan.docx" placeholder="Tên file...">
         <button id="downloadBtn">📥 Tải xuống file .docx</button>
     </div>
@@ -155,4 +151,3 @@
     <div id="render-hidden" style="position: absolute; visibility: hidden; left: -9999px;"></div>
 </body>
 </html>
-
