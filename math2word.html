@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chuyển Toán học sang DOCX (Đã sửa lỗi)</title>
+    <title>Chuyển Toán học sang DOCX (Hoạt động trên GitHub)</title>
 
     <script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
@@ -17,19 +17,19 @@
 
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 20px; background-color: #f4f4f9; margin: 0; }
-        .container { width: 100%; max-width: 800px; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px M10px rgba(0,0,0,0.1); }
+        .container { width: 100%; max-width: 800px; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         h2 { text-align: center; color: #333; margin-top: 0; margin-bottom: 20px; }
         textarea { width: 100%; height: 250px; padding: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; margin-bottom: 15px; box-sizing: border-box; line-height: 1.6; }
         input[type="text"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; margin-bottom: 20px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; font-size: 18px; cursor: pointer; transition: background-color 0.2s; }
-        button:hover { background-color: #0056b3; }
+        button { width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 4px; font-size: 18px; cursor: pointer; transition: background-color 0.2s; }
+        button:hover { background-color: #218838; }
         button:disabled { background-color: #ccc; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Công cụ Download DOCX (Bản cải tiến)</h2>
+        <h2>Công cụ Download DOCX (Bản ổn định)</h2>
         <textarea id="mathInput" placeholder="Nhập đề bài tại đây...&#10;Dùng $...$ cho công thức inline, ví dụ: phương trình $x^2 - 2x + 1 = 0$.&#10;Dùng $$...$$ cho công thức riêng một dòng và sẽ được căn giữa.&#10;$$E = mc^2$$"></textarea>
         <input type="text" id="fileName" value="baitap_toan.docx" placeholder="Tên file...">
         <button id="downloadBtn">📥 Tải xuống file .docx</button>
@@ -45,9 +45,20 @@
         const fileNameInput = document.getElementById('fileName');
         const renderDiv = document.getElementById('render-hidden');
 
-        // Hàm chuyển đổi SVG sang ảnh Base64
+        // *** ĐÂY LÀ THAY ĐỔI QUAN TRỌNG NHẤT ***
+        // Hàm chuyển đổi SVG sang ảnh Base64 một cách an toàn bằng FileReader
         function svgStringToBase64(svgString) {
-            return `data:image/svg+xml;base64,${btoa(svgString)}`;
+            return new Promise(resolve => {
+                const blob = new Blob([svgString], { type: 'image/svg+xml' });
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    // reader.result là một Data URL đầy đủ (VD: "data:image/svg+xml;base64,PHN2Zy...")
+                    // Chúng ta cần tách để lấy phần Base64 tinh khiết ở sau dấu phẩy.
+                    const base64data = reader.result.split(',')[1];
+                    resolve(base64data);
+                };
+                reader.readAsDataURL(blob);
+            });
         }
         
         // Hàm render một công thức LaTeX thành ảnh
@@ -57,19 +68,19 @@
             const svgElement = renderDiv.querySelector('svg');
             if (!svgElement) return null;
 
-            // Thêm namespace để đảm bảo tương thích
             svgElement.setAttribute("xmlns", "http://www.w3.org/2000/svg");
             
             const serializer = new XMLSerializer();
             const svgString = serializer.serializeToString(svgElement);
             
-            // Lấy kích thước và chuyển từ 'ex' sang pixel (ước lượng)
-            // Tỷ lệ 8.5 là một con số kinh nghiệm cho ra kết quả tốt
             const width = parseFloat(svgElement.getAttribute('width').replace('ex', '')) * 8.5;
             const height = parseFloat(svgElement.getAttribute('height').replace('ex', '')) * 8.5;
 
+            // Chờ hàm chuyển đổi mới hoàn thành
+            const base64Image = await svgStringToBase64(svgString);
+
             return {
-                data: svgStringToBase64(svgString),
+                data: base64Image, // Dữ liệu bây giờ là Base64 tinh khiết
                 width,
                 height,
             };
@@ -87,30 +98,25 @@
 
             try {
                 const docParagraphs = [];
-                // Regex để tìm các khối toán học $...$ hoặc $$...$$
                 const regex = /(\$\$?[\s\S]+?\$\$?)/g;
-
-                // 1. Tách toàn bộ văn bản thành các dòng
                 const lines = fullText.split('\n');
 
                 for (const line of lines) {
-                    // Nếu dòng trống, tạo một paragraph trống
                     if (!line.trim()) {
                         docParagraphs.push(new Paragraph({ children: [new TextRun("")] }));
                         continue;
                     }
 
-                    const children = []; // Chứa các TextRun và ImageRun cho paragraph hiện tại
-                    const parts = line.split(regex).filter(part => part); // Tách dòng thành chữ và công thức
+                    const children = []; 
+                    const parts = line.split(regex).filter(part => part);
 
                     for (const part of parts) {
-                        // 2. Với mỗi phần, kiểm tra xem nó là công thức hay chữ thường
                         if (part.match(regex)) {
-                            // Nếu là công thức, render nó thành ảnh
                             const image = await renderMathToImage(part);
                             if (image) {
+                                // Thư viện docx cần dữ liệu Base64 tinh khiết, hàm mới đã cung cấp đúng định dạng
                                 children.push(new ImageRun({
-                                    data: image.data,
+                                    data: image.data, 
                                     transformation: {
                                         width: image.width,
                                         height: image.height,
@@ -118,24 +124,19 @@
                                 }));
                             }
                         } else {
-                            // Nếu là chữ, thêm nó vào như TextRun
                             children.push(new TextRun(part));
                         }
                     }
 
-                    // 3. Quyết định căn lề cho Paragraph
                     let alignment = AlignmentType.LEFT;
                     const trimmedLine = line.trim();
-                    // Nếu cả dòng chỉ là một công thức $$...$$, thì căn giữa
                     if (trimmedLine.startsWith('$$') && trimmedLine.endsWith('$$') && parts.length === 1) {
                         alignment = AlignmentType.CENTER;
                     }
                     
-                    // Tạo Paragraph mới từ các children đã thu thập
                     docParagraphs.push(new Paragraph({ children, alignment }));
                 }
 
-                // Tạo tài liệu và tải xuống
                 const doc = new Document({
                     sections: [{
                         children: docParagraphs,
@@ -147,7 +148,7 @@
 
             } catch (error) {
                 console.error("Lỗi khi tạo file DOCX:", error);
-                alert("Đã xảy ra lỗi khi tạo file. Vui lòng thử lại.");
+                alert("Đã xảy ra lỗi khi tạo file. Vui lòng kiểm tra lại Console (F12) để biết chi tiết.");
             } finally {
                 downloadBtn.disabled = false;
                 downloadBtn.textContent = '📥 Tải xuống file .docx';
